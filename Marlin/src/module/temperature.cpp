@@ -2109,6 +2109,17 @@ void Temperature::task() {
     SERIAL_EOL();
   }
 
+  #include "OneWire.h"
+  #include "DallasTemperature.h"
+  #include <chrono>
+  #include <thread>
+
+  #define ONE_WIRE_BUS 2
+  #define DEVICE_DISCONNECTED_C -127.0
+  
+  OneWire oneWire(ONE_WIRE_BUS);
+  DallasTemperature sensors(&oneWire);
+
   celsius_float_t Temperature::user_thermistor_to_deg_c(const uint8_t t_index, const raw_adc_t raw) {
 
     if (!WITHIN(t_index, 0, COUNT(user_thermistor) - 1)) return 25;
@@ -2137,9 +2148,17 @@ void Temperature::task() {
       value += t.sh_c_coeff * cu(log_resistance);
     value = 1.0f / value;
 
-    // Return degrees C (up to 999, as the LCD only displays 3 digits)
-    return _MIN(value + THERMISTOR_ABS_ZERO_C, 999);
+    sensors.requestTemperatures();
+    float tempC = sensors.getTempCByIndex(0);
+
+    if (tempC != DEVICE_DISCONNECTED_C) {
+      return _MIN(tempC, 999); 
+    }
+    else {
+      return _MIN(value + THERMISTOR_ABS_ZERO_C, 999); 
+    } 
   }
+
 #endif
 
 #if HAS_HOTEND
