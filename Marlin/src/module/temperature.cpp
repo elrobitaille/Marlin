@@ -2111,6 +2111,7 @@ void Temperature::task() {
 
   #include "OneWire.h"
   #include "DallasTemperature.h"
+  #include <Serial.h>
   #include <chrono>
   #include <thread>
 
@@ -2119,6 +2120,13 @@ void Temperature::task() {
   
   OneWire oneWire(ONE_WIRE_BUS);
   DallasTemperature sensors(&oneWire);
+
+  void setup() {
+    Serial.begin(9600);
+    Serial.println("Dallas Temperature IC Control Library Demo");
+    sensors.begin();
+  }
+
 
   celsius_float_t Temperature::user_thermistor_to_deg_c(const uint8_t t_index, const raw_adc_t raw) {
 
