@@ -1,3 +1,7 @@
+/* I MODIFIED A FEW THINGS AND PUT MY NAME NEXT TO EVERYTHING I MODIFIED TO KEEP TRACK.
+CONTROL F MY NAME: "Edgar" IN ORDER TO FIND EVERY PLACE THAT I MODIFIED OR THOUGHT THAT 
+WAS SOMEWHAT IMPORTANT. THANKS */
+
 /**
  * Marlin 3D Printer Firmware
  * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
@@ -227,10 +231,10 @@
 
 // This defines the number of extruders
 // :[0, 1, 2, 3, 4, 5, 6, 7, 8]
-#define EXTRUDERS 1
+#define EXTRUDERS 2 //Edgar
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
-#define DEFAULT_NOMINAL_FILAMENT_DIA 1.75
+#define DEFAULT_NOMINAL_FILAMENT_DIA 2.85
 
 // For Cyclops or any "multi-extruder" that shares a single nozzle.
 //#define SINGLENOZZLE
@@ -545,11 +549,13 @@
  *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.
  *
  */
-#define TEMP_SENSOR_0 1
-#define TEMP_SENSOR_1 0
-#define TEMP_SENSOR_2 0
-#define TEMP_SENSOR_3 0
-#define TEMP_SENSOR_4 0
+
+#define HEATER_1_PIN 8  // Edgar
+#define TEMP_SENSOR_0 4
+#define TEMP_SENSOR_1 4
+#define TEMP_SENSOR_2 4
+#define TEMP_SENSOR_3 4
+#define TEMP_SENSOR_4 4
 #define TEMP_SENSOR_5 0
 #define TEMP_SENSOR_6 0
 #define TEMP_SENSOR_7 0
@@ -654,7 +660,7 @@
 //===========================================================================
 
 // @section hotend temp
-
+// Edgar - Here is Bang Bang and PID Information. Just FYI
 // Enable PIDTEMP for PID control or MPCTEMP for Predictive Model.
 // temperature control. Disable both for bang-bang heating.
 #define PIDTEMP          // See the PID Tuning Guide at https://reprap.org/wiki/PID_Tuning
@@ -832,7 +838,7 @@
  *
  * *** IT IS HIGHLY RECOMMENDED TO LEAVE THIS OPTION ENABLED! ***
  */
-#define PREVENT_COLD_EXTRUSION
+//#define PREVENT_COLD_EXTRUSION //Edgar
 #define EXTRUDE_MINTEMP 170
 
 /**
@@ -872,7 +878,8 @@
 
 // Enable one of the options below for CoreXY, CoreXZ, or CoreYZ kinematics,
 // either in the usual order or reversed
-//#define COREXY
+//#define COREXY 
+#define NUM_AXIS 3 //Edgar
 //#define COREXZ
 //#define COREYZ
 //#define COREYX
@@ -880,7 +887,6 @@
 //#define COREZY
 //#define MARKFORGED_XY  // MarkForged. See https://reprap.org/forum/read.php?152,504042
 //#define MARKFORGED_YX
-
 // Enable for a belt style printer with endless "Z" motion
 //#define BELTPRINTER
 
@@ -1091,13 +1097,13 @@
 //===========================================================================
 
 // @section endstops
-
+#define ENDSTOPPULLUPS //Edgar - Not sure if this line is needed 
 // Specify here all the endstop connectors that are connected to any endstop or probe.
 // Almost all printers will be using one per axis. Probes will use one or more of the
 // extra connectors. Leave undefined any used for non-endstop and non-probe purposes.
-#define USE_XMIN_PLUG
-#define USE_YMIN_PLUG
-#define USE_ZMIN_PLUG
+#define USE_XMIN_PLUG //Edgar - Removed endstop
+#define USE_YMIN_PLUG //Edgar - Removed endstop
+#define USE_ZMIN_PLUG //Edgar - Removed endstop
 //#define USE_IMIN_PLUG
 //#define USE_JMIN_PLUG
 //#define USE_KMIN_PLUG
@@ -1165,9 +1171,9 @@
 #endif
 
 // Mechanical endstop with COM to ground and NC to Signal uses "false" here (most common setup).
-#define X_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
-#define Y_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
-#define Z_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
+#define X_MIN_ENDSTOP_INVERTING true // Set to true to invert the logic of the endstop.
+#define Y_MIN_ENDSTOP_INVERTING true // Set to true to invert the logic of the endstop.
+#define Z_MIN_ENDSTOP_INVERTING true // Set to true to invert the logic of the endstop.
 #define I_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
 #define J_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
 #define K_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
