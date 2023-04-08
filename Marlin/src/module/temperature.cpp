@@ -36,6 +36,7 @@
 #include "endstops.h"
 #include "planner.h"
 #include "printcounter.h"
+#include <Arduino.h>
 
 #if EITHER(HAS_COOLER, LASER_COOLANT_FLOW_METER)
   #include "../feature/cooler.h"
@@ -2108,24 +2109,33 @@ void Temperature::task() {
     );
     SERIAL_EOL();
   }
-
+  
   #include "OneWire.h"
   #include "DallasTemperature.h"
-  #include <Serial.h>
-  #include <chrono>
-  #include <thread>
-
-  #define ONE_WIRE_BUS 2
-  #define DEVICE_DISCONNECTED_C -127.0
   
-  OneWire oneWire(ONE_WIRE_BUS);
-  DallasTemperature sensors(&oneWire);
 
-  void setup() {
-    Serial.begin(9600);
-    Serial.println("Dallas Temperature IC Control Library Demo");
-    sensors.begin();
-  }
+  #define DEVICE_DISCONNECTED_C -127.0
+
+  #include "temperature.h"
+
+ // OneWire Temperature::oneWire(2);
+  // DallasTemperature Temperature::sensors(&oneWire);
+
+  celsius_float_t Temperature::read_temperature_from_dallas_sensor() {
+    static OneWire oneWire(2);
+    static DallasTemperature sensors(&oneWire);
+    
+    sensors.requestTemperatures();
+    float tempC = sensors.getTempCByIndex(0);
+
+    // Check if reading was successful
+    if (tempC != DEVICE_DISCONNECTED_C) {
+        return tempC;
+    } else {
+        // Handle the error case (optional)
+        return -1;
+    }
+}
 
 
   celsius_float_t Temperature::user_thermistor_to_deg_c(const uint8_t t_index, const raw_adc_t raw) {
@@ -2156,17 +2166,9 @@ void Temperature::task() {
       value += t.sh_c_coeff * cu(log_resistance);
     value = 1.0f / value;
 
-    sensors.requestTemperatures();
-    float tempC = sensors.getTempCByIndex(0);
-
-    if (tempC != DEVICE_DISCONNECTED_C) {
-      return _MIN(tempC, 999); 
-    }
-    else {
-      return _MIN(value + THERMISTOR_ABS_ZERO_C, 999); 
-    } 
+    // Return degrees C (up to 999, as the LCD only displays 3 digits)
+    return _MIN(value + THERMISTOR_ABS_ZERO_C, 999);
   }
-
 #endif
 
 #if HAS_HOTEND
@@ -2183,6 +2185,7 @@ void Temperature::task() {
 
     switch (e) {
       case 0:
+      /*
         #if TEMP_SENSOR_0_IS_CUSTOM
           return user_thermistor_to_deg_c(CTI_HOTEND_0, raw);
         #elif TEMP_SENSOR_IS_MAX_TC(0)
@@ -2201,6 +2204,13 @@ void Temperature::task() {
         #else
           break;
         #endif
+      */
+      #if TEMP_SENSOR_0 == 999
+        return Temperature::read_temperature_from_dallas_sensor();
+      #else
+        return 50.0;
+      #endif
+
       case 1:
         #if TEMP_SENSOR_1_IS_CUSTOM
           return user_thermistor_to_deg_c(CTI_HOTEND_1, raw);
@@ -2292,6 +2302,7 @@ void Temperature::task() {
       default: break;
     }
 
+
     #if HAS_HOTEND_THERMISTOR
       // Thermistor with conversion table?
       const temp_entry_t(*tt)[] = (temp_entry_t(*)[])(heater_ttbl_map[e]);
@@ -2300,6 +2311,7 @@ void Temperature::task() {
 
     return 0;
   }
+
 #endif // HAS_HOTEND
 
 #if HAS_HEATED_BED
@@ -2554,6 +2566,7 @@ void Temperature::updateTemperaturesFromRawValues() {
  *  - Init temp_range[], used for catching min/maxtemp
  */
 void Temperature::init() {
+
 
   TERN_(PROBING_HEATERS_OFF, paused_for_probing = false);
 
