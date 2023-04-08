@@ -580,17 +580,15 @@ typedef struct { raw_adc_t raw_min, raw_max; celsius_t mintemp, maxtemp; } temp_
   #define HAS_FAN_LOGIC 1
 #endif
 
-///#include "OneWire.h"
-//#include "DallasTemperature.h"
-
-#define DEVICE_DISCONNECTED_C -127.0
+#include "OneWire.h"
+#include "DallasTemperature.h"
 
 class Temperature {
 
   public:
 
-    static celsius_float_t read_temperature_from_dallas_sensor();
-    
+  static celsius_float_t read_temperature_from_dallas_sensor();
+
     #if HAS_HOTEND
       static hotend_info_t temp_hotend[HOTENDS];
       static constexpr celsius_t hotend_maxtemp[HOTENDS] = ARRAY_BY_HOTENDS(HEATER_0_MAXTEMP, HEATER_1_MAXTEMP, HEATER_2_MAXTEMP, HEATER_3_MAXTEMP, HEATER_4_MAXTEMP, HEATER_5_MAXTEMP, HEATER_6_MAXTEMP, HEATER_7_MAXTEMP);
@@ -718,6 +716,9 @@ class Temperature {
     #endif
 
   private:
+
+    static OneWire oneWire;
+    static DallasTemperature sensors;
 
     #if ENABLED(WATCH_HOTENDS)
       static hotend_watch_t watch_hotend[HOTENDS];

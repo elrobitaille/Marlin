@@ -32,11 +32,19 @@
 #include "../lcd/marlinui.h"
 #include "../gcode/gcode.h"
 
+#define TEMP_SENSOR_0 999
 #include "temperature.h"
 #include "endstops.h"
 #include "planner.h"
 #include "printcounter.h"
 #include <Arduino.h>
+
+
+#include "OneWire.h"
+#include "DallasTemperature.h"
+
+#define DEVICE_DISCONNECTED_C -127.0
+
 
 #if EITHER(HAS_COOLER, LASER_COOLANT_FLOW_METER)
   #include "../feature/cooler.h"
@@ -210,7 +218,7 @@
 #endif
 
 Temperature thermalManager;
-
+celsius_float_t Temperature::read_temperature_from_dallas_sensor();
 PGMSTR(str_t_thermal_runaway, STR_T_THERMAL_RUNAWAY);
 PGMSTR(str_t_temp_malfunction, STR_T_MALFUNCTION);
 PGMSTR(str_t_heating_failed, STR_T_HEATING_FAILED);
@@ -2109,22 +2117,11 @@ void Temperature::task() {
     );
     SERIAL_EOL();
   }
-  
-  #include "OneWire.h"
-  #include "DallasTemperature.h"
-  
-
-  #define DEVICE_DISCONNECTED_C -127.0
-
-  #include "temperature.h"
-
- // OneWire Temperature::oneWire(2);
-  // DallasTemperature Temperature::sensors(&oneWire);
 
   celsius_float_t Temperature::read_temperature_from_dallas_sensor() {
     static OneWire oneWire(2);
     static DallasTemperature sensors(&oneWire);
-    
+   
     sensors.requestTemperatures();
     float tempC = sensors.getTempCByIndex(0);
 
@@ -2316,7 +2313,7 @@ void Temperature::task() {
 
 #if HAS_HEATED_BED
   // For bed temperature measurement.
-  celsius_float_t Temperature::analog_to_celsius_bed(const raw_adc_t raw) {
+ celsius_float_t Temperature::analog_to_celsius_bed(const raw_adc_t raw) {
     #if TEMP_SENSOR_BED_IS_CUSTOM
       return user_thermistor_to_deg_c(CTI_BED, raw);
     #elif TEMP_SENSOR_BED_IS_THERMISTOR
