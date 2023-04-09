@@ -218,7 +218,6 @@
 #endif
 
 Temperature thermalManager;
-celsius_float_t Temperature::read_temperature_from_dallas_sensor();
 PGMSTR(str_t_thermal_runaway, STR_T_THERMAL_RUNAWAY);
 PGMSTR(str_t_temp_malfunction, STR_T_MALFUNCTION);
 PGMSTR(str_t_heating_failed, STR_T_HEATING_FAILED);
@@ -2118,23 +2117,6 @@ void Temperature::task() {
     SERIAL_EOL();
   }
 
-  celsius_float_t Temperature::read_temperature_from_dallas_sensor() {
-    static OneWire oneWire(2);
-    static DallasTemperature sensors(&oneWire);
-   
-    sensors.requestTemperatures();
-    float tempC = sensors.getTempCByIndex(0);
-
-    // Check if reading was successful
-    if (tempC != DEVICE_DISCONNECTED_C) {
-        return tempC;
-    } else {
-        // Handle the error case (optional)
-        return -1;
-    }
-}
-
-
   celsius_float_t Temperature::user_thermistor_to_deg_c(const uint8_t t_index, const raw_adc_t raw) {
 
     if (!WITHIN(t_index, 0, COUNT(user_thermistor) - 1)) return 25;
@@ -2181,33 +2163,26 @@ void Temperature::task() {
     }
 
     switch (e) {
-      case 0:
-      /*
-        #if TEMP_SENSOR_0_IS_CUSTOM
-          return user_thermistor_to_deg_c(CTI_HOTEND_0, raw);
-        #elif TEMP_SENSOR_IS_MAX_TC(0)
-          #if TEMP_SENSOR_0_IS_MAX31865
-            return TERN(LIB_INTERNAL_MAX31865,
-              max31865_0.temperature(raw),
-              max31865_0.temperature(MAX31865_SENSOR_OHMS_0, MAX31865_CALIBRATION_OHMS_0)
-            );
-          #else
-            return (int16_t)raw * 0.25;
-          #endif
-        #elif TEMP_SENSOR_0_IS_AD595
-          return TEMP_AD595(raw);
-        #elif TEMP_SENSOR_0_IS_AD8495
-          return TEMP_AD8495(raw);
-        #else
-          break;
-        #endif
-      */
-      #if TEMP_SENSOR_0 == 999
-        return Temperature::read_temperature_from_dallas_sensor();
-      #else
-        return 50.0;
-      #endif
+    case 0:
+      if (TEMP_SENSOR_0 == 999) {
+        static OneWire oneWire(2);
+        static DallasTemperature sensors(&oneWire);
 
+        sensors.requestTemperatures();
+        float tempC = sensors.getTempCByIndex(0);
+
+        // Check if reading was successful
+        if (tempC != DEVICE_DISCONNECTED_C) {
+          // Return degrees C (up to 999, as the LCD only displays 3 digits)
+          return _MIN(tempC + THERMISTOR_ABS_ZERO_C, 999);
+        } else {
+          // Handle the error case (optional)
+          return -1;
+        }
+      } else {
+        // Replace this with your own code if you're not using the Dallas sensor
+        return 50.0;
+      }
       case 1:
         #if TEMP_SENSOR_1_IS_CUSTOM
           return user_thermistor_to_deg_c(CTI_HOTEND_1, raw);

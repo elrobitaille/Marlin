@@ -587,7 +587,7 @@ class Temperature {
 
   public:
 
-  static celsius_float_t read_temperature_from_dallas_sensor();
+  //static celsius_float_t read_temperature_from_dallas_sensor();
 
     #if HAS_HOTEND
       static hotend_info_t temp_hotend[HOTENDS];
