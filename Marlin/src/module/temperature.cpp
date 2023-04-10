@@ -40,10 +40,7 @@
 #include <Arduino.h>
 
 
-#include "OneWire.h"
-#include "DallasTemperature.h"
 
-#define DEVICE_DISCONNECTED_C -127.0
 
 
 #if EITHER(HAS_COOLER, LASER_COOLANT_FLOW_METER)
@@ -749,7 +746,7 @@ volatile bool Temperature::raw_temps_ready = false;
 
       const millis_t ms = millis();
 
-      if (updateTemperaturesIfReady()) { // temp sample ready
+      if (Temperature::tempManager.updateTemperaturesIfReady()) { // temp sample ready
 
         // Get the current temperature and constrain it
         current_temp = GHV(degChamber(), degBed(), degHotend(heater_id));
@@ -943,7 +940,7 @@ volatile bool Temperature::raw_temps_ready = false;
     auto housekeeping = [] (millis_t &ms, const uint8_t e, celsius_float_t &current_temp, millis_t &next_report_ms) {
       ms = millis();
 
-      if (updateTemperaturesIfReady()) { // temp sample ready
+      if (Temperature::tempManager.updateTemperaturesIfReady()) { // temp sample ready
         current_temp = degHotend(e);
         TERN_(HAS_FAN_LOGIC, manage_extruder_fans(ms));
       }
@@ -1943,7 +1940,7 @@ void Temperature::task() {
     #endif
   #endif
 
-  if (!updateTemperaturesIfReady()) return; // Will also reset the watchdog if temperatures are ready
+  if (!Temperature::tempManager.updateTemperaturesIfReady()) return; // Will also reset the watchdog if temperatures are ready
 
   #if DISABLED(IGNORE_THERMOCOUPLE_ERRORS)
     #if TEMP_SENSOR_IS_MAX_TC(0)
@@ -2117,6 +2114,18 @@ void Temperature::task() {
     SERIAL_EOL();
   }
 
+#include "OneWire.h"
+#include "/Users/edgarrobitaille/Bioreactor/Marlin/Marlin/src/libs/DallasTemperature.h"
+
+
+#define DEVICE_DISCONNECTED_C -127.0
+#define ONEWIRE_PIN 2
+
+OneWire oneWire(ONEWIRE_PIN);
+DallasTemperature Temperature::sensors(&oneWire);
+Temperature Temperature::tempManager;
+
+
   celsius_float_t Temperature::user_thermistor_to_deg_c(const uint8_t t_index, const raw_adc_t raw) {
 
     if (!WITHIN(t_index, 0, COUNT(user_thermistor) - 1)) return 25;
@@ -2150,10 +2159,11 @@ void Temperature::task() {
   }
 #endif
 
+
 #if HAS_HOTEND
   // Derived from RepRap FiveD extruder::getTemperature()
   // For hot end temperature measurement.
-  celsius_float_t Temperature::analog_to_celsius_hotend(const raw_adc_t raw, const uint8_t e) {
+  static celsius_float_t Temperature::analog_to_celsius_hotend(const raw_adc_t raw, const uint8_t e) {
     if (e >= HOTENDS) {
       SERIAL_ERROR_START();
       SERIAL_ECHO(e);
@@ -2165,24 +2175,20 @@ void Temperature::task() {
     switch (e) {
     case 0:
       if (TEMP_SENSOR_0 == 999) {
-        static OneWire oneWire(2);
-        static DallasTemperature sensors(&oneWire);
-
-        sensors.requestTemperatures();
-        float tempC = sensors.getTempCByIndex(0);
-
+        tempManager.sensors.requestTemperatures();
+        float tempC = tempManager.sensors.getTempCByIndex(0);
         // Check if reading was successful
-        if (tempC != DEVICE_DISCONNECTED_C) {
-          // Return degrees C (up to 999, as the LCD only displays 3 digits)
-          return _MIN(tempC + THERMISTOR_ABS_ZERO_C, 999);
+         if (tempC != DEVICE_DISCONNECTED_C) {
+            // Return degrees C (up to 999, as the LCD only displays 3 digits)
+            return _MIN(tempC, 999);
+          } else {
+            // Handle the error case (optional)
+            return -1;
+          }
         } else {
-          // Handle the error case (optional)
-          return -1;
+          // Replace this with your own code if you're not using the Dallas sensor
+          return 50.0;
         }
-      } else {
-        // Replace this with your own code if you're not using the Dallas sensor
-        return 50.0;
-      }
       case 1:
         #if TEMP_SENSOR_1_IS_CUSTOM
           return user_thermistor_to_deg_c(CTI_HOTEND_1, raw);
@@ -2430,7 +2436,7 @@ void Temperature::updateTemperaturesFromRawValues() {
   #endif
 
   #if HAS_HOTEND
-    HOTEND_LOOP() temp_hotend[e].celsius = analog_to_celsius_hotend(temp_hotend[e].getraw(), e);
+    HOTEND_LOOP() temp_hotend[e].celsius = tempManager.analog_to_celsius_hotend(temp_hotend[e].getraw(), e);
   #endif
 
   TERN_(HAS_HEATED_BED,     temp_bed.celsius       = analog_to_celsius_bed(temp_bed.getraw()));

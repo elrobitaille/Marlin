@@ -581,13 +581,17 @@ typedef struct { raw_adc_t raw_min, raw_max; celsius_t mintemp, maxtemp; } temp_
 #endif
 
 #include "OneWire.h"
-#include "DallasTemperature.h"
+#include "/Users/edgarrobitaille/Bioreactor/Marlin/Marlin/src/libs/DallasTemperature.h"
 
 class Temperature {
 
   public:
-
   //static celsius_float_t read_temperature_from_dallas_sensor();
+
+  Temperature() : oneWire(ONEWIRE_PIN), sensors(&oneWire) {}
+
+  OneWire oneWire;
+  DallasTemperature sensors;
 
     #if HAS_HOTEND
       static hotend_info_t temp_hotend[HOTENDS];
@@ -716,10 +720,8 @@ class Temperature {
     #endif
 
   private:
-
-    static OneWire oneWire;
-    static DallasTemperature sensors;
-
+    static Temperature tempManager;
+    
     #if ENABLED(WATCH_HOTENDS)
       static hotend_watch_t watch_hotend[HOTENDS];
     #endif
@@ -1251,10 +1253,10 @@ class Temperature {
     // Reading raw temperatures and converting to Celsius when ready
     static volatile bool raw_temps_ready;
     static void update_raw_temperatures();
-    static void updateTemperaturesFromRawValues();
-    static bool updateTemperaturesIfReady() {
+    void updateTemperaturesFromRawValues();
+    bool updateTemperaturesIfReady() {
       if (!raw_temps_ready) return false;
-      updateTemperaturesFromRawValues();
+      Temperature::updateTemperaturesFromRawValues();
       raw_temps_ready = false;
       return true;
     }
