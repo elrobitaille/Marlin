@@ -582,8 +582,11 @@ typedef struct { raw_adc_t raw_min, raw_max; celsius_t mintemp, maxtemp; } temp_
   #define HAS_FAN_LOGIC 1
 #endif
 
-#include "OneWire.h"
-#include "/Users/edgarrobitaille/Bioreactor/Marlin/Marlin/src/libs/DallasTemperature.h"
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+#define DEVICE_DISCONNECTED_C -127.0
+#define ONE_WIRE_BUS 2
 
 class Temperature {
 
