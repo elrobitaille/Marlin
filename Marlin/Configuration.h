@@ -565,7 +565,7 @@ WAS SOMEWHAT IMPORTANT. THANKS */
 #define TEMP_SENSOR_COOLER 0
 #define TEMP_SENSOR_BOARD 0
 #define TEMP_SENSOR_REDUNDANT 0
-#define ONEWIRE_PIN 2 // Edgar 
+#define ONEWIRE_PIN 2
 
 // Dummy thermistor constant temperature readings, for use with 998 and 999
 #define DUMMY_THERMISTOR_998_VALUE  25
@@ -1105,9 +1105,6 @@ WAS SOMEWHAT IMPORTANT. THANKS */
 #define USE_XMIN_PLUG //Edgar - Removed endstop
 #define USE_YMIN_PLUG //Edgar - Removed endstop
 #define USE_ZMIN_PLUG //Edgar - Removed endstop
-#define X_MIN_PIN -1
-#define Y_MIN_PIN -1
-#define Z_MIN_PIN -1
 //#define USE_IMIN_PLUG
 //#define USE_JMIN_PLUG
 //#define USE_KMIN_PLUG
@@ -1649,7 +1646,7 @@ WAS SOMEWHAT IMPORTANT. THANKS */
 // Enable the M48 repeatability test to test probe accuracy
 //#define Z_MIN_PROBE_REPEATABILITY_TEST
 
-// Before deploy/stow pause for confirmation
+// Before deploy/stow pause for user confirmation
 //#define PAUSE_BEFORE_DEPLOY_STOW
 #if ENABLED(PAUSE_BEFORE_DEPLOY_STOW)
   //#define PAUSE_PROBE_DEPLOY_WHEN_TRIGGERED // For Manual Deploy Allenkey Probe
