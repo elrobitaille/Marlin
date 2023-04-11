@@ -49,7 +49,7 @@
 #define E_NAME TERN_(HAS_MULTI_HOTEND, e)
 
 // Element identifiers. Positive values are hotends. Negative values are other heaters or coolers.
-typedef enum : int8_t {
+typedef enum : int_fast8_t {
   H_REDUNDANT = HID_REDUNDANT,
   H_COOLER = HID_COOLER,
   H_PROBE = HID_PROBE,
@@ -377,7 +377,9 @@ typedef struct { float p, i, d, c, f; } raw_pidcf_t;
 
 #elif ENABLED(MPCTEMP)
 
-  typedef struct {
+  typedef struct MPC {
+    static bool e_paused;               // Pause E filament permm tracking
+    static int32_t e_position;          // For E tracking
     float heater_power;                 // M306 P
     float block_heat_capacity;          // M306 C
     float sensor_responsiveness;        // M306 R
@@ -586,12 +588,6 @@ typedef struct { raw_adc_t raw_min, raw_max; celsius_t mintemp, maxtemp; } temp_
 class Temperature {
 
   public:
-  //static celsius_float_t read_temperature_from_dallas_sensor();
-
-  Temperature() : oneWire(ONEWIRE_PIN), sensors(&oneWire) {}
-
-  OneWire oneWire;
-  DallasTemperature sensors;
 
     #if HAS_HOTEND
       static hotend_info_t temp_hotend[HOTENDS];
@@ -720,15 +716,9 @@ class Temperature {
     #endif
 
   private:
-    
-    static Temperature tempManager;
-    
+
     #if ENABLED(WATCH_HOTENDS)
       static hotend_watch_t watch_hotend[HOTENDS];
-    #endif
-
-    #if ENABLED(MPCTEMP)
-      static int32_t mpc_e_position;
     #endif
 
     #if HAS_HOTEND
@@ -736,23 +726,27 @@ class Temperature {
     #endif
 
     #if HAS_HEATED_BED
-      #if ENABLED(WATCH_BED)
+      #if WATCH_BED
         static bed_watch_t watch_bed;
       #endif
-      IF_DISABLED(PIDTEMPBED, static millis_t next_bed_check_ms);
+      #if DISABLED(PIDTEMPBED)
+        static millis_t next_bed_check_ms;
+      #endif
       static raw_adc_t mintemp_raw_BED, maxtemp_raw_BED;
     #endif
 
     #if HAS_HEATED_CHAMBER
-      #if ENABLED(WATCH_CHAMBER)
+      #if WATCH_CHAMBER
         static chamber_watch_t watch_chamber;
       #endif
-      TERN(PIDTEMPCHAMBER,,static millis_t next_chamber_check_ms);
+      #if DISABLED(PIDTEMPCHAMBER)
+        static millis_t next_chamber_check_ms;
+      #endif
       static raw_adc_t mintemp_raw_CHAMBER, maxtemp_raw_CHAMBER;
     #endif
 
     #if HAS_COOLER
-      #if ENABLED(WATCH_COOLER)
+      #if WATCH_COOLER
         static cooler_watch_t watch_cooler;
       #endif
       static millis_t next_cooler_check_ms, cooler_fan_flush_ms;
@@ -1205,7 +1199,7 @@ class Temperature {
 
     #endif
 
-    #if ENABLED(MPCTEMP)
+    #if ENABLED(MPC_AUTOTUNE)
       void MPC_autotune(const uint8_t e);
     #endif
 
@@ -1254,10 +1248,10 @@ class Temperature {
     // Reading raw temperatures and converting to Celsius when ready
     static volatile bool raw_temps_ready;
     static void update_raw_temperatures();
-    void updateTemperaturesFromRawValues();
-    bool updateTemperaturesIfReady() {
+    static void updateTemperaturesFromRawValues();
+    static bool updateTemperaturesIfReady() {
       if (!raw_temps_ready) return false;
-      Temperature::updateTemperaturesFromRawValues();
+      updateTemperaturesFromRawValues();
       raw_temps_ready = false;
       return true;
     }
@@ -1328,12 +1322,12 @@ class Temperature {
       typedef struct {
         millis_t timer = 0;
         TRState state = TRInactive;
-        float running_temp;
+        celsius_float_t running_temp;
         #if ENABLED(THERMAL_PROTECTION_VARIANCE_MONITOR)
           millis_t variance_timer = 0;
           celsius_float_t last_temp = 0.0, variance = 0.0;
         #endif
-        void run(const_celsius_float_t current, const_celsius_float_t target, const heater_id_t heater_id, const uint16_t period_seconds, const celsius_t hysteresis_degc);
+        void run(const_celsius_float_t current, const_celsius_float_t target, const heater_id_t heater_id, const uint16_t period_seconds, const celsius_float_t hysteresis_degc);
       } tr_state_machine_t;
 
       static tr_state_machine_t tr_state_machine[NR_HEATER_RUNAWAY];
