@@ -720,6 +720,7 @@ class Temperature {
     #endif
 
   private:
+    
     static Temperature tempManager;
     
     #if ENABLED(WATCH_HOTENDS)
