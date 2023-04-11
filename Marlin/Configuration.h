@@ -565,7 +565,7 @@ WAS SOMEWHAT IMPORTANT. THANKS */
 #define TEMP_SENSOR_COOLER 0
 #define TEMP_SENSOR_BOARD 0
 #define TEMP_SENSOR_REDUNDANT 0
-#define ONEWIRE_PIN 2
+#define ONE_WIRE_BUS 2
 
 // Dummy thermistor constant temperature readings, for use with 998 and 999
 #define DUMMY_THERMISTOR_998_VALUE  25

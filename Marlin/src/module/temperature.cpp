@@ -2114,8 +2114,6 @@ void Temperature::task() {
   #include <OneWire.h>
   #include <DallasTemperature.h>
 
-  //using Temperature::getTemperatureC;
-
   #define DEVICE_DISCONNECTED_C -127.0
   #define ONE_WIRE_BUS 2
   
@@ -2167,7 +2165,24 @@ void Temperature::task() {
 
     switch (e) {
       case 0:
-      /* 
+    if (TEMP_SENSOR_0 == 999) {
+      // Use the DallasTemperature library to read the temperature
+      OneWire oneWire(ONE_WIRE_BUS);
+      DallasTemperature sensors(&oneWire);
+      sensors.begin();
+      sensors.requestTemperatures();
+      float tempC = sensors.getTempCByIndex(0);
+
+    // Check if reading was successful
+    if (tempC != DEVICE_DISCONNECTED_C) {
+      // Return degrees C (up to 999, as the LCD only displays 3 digits)
+      return _MIN(tempC, 999);
+    } else {
+     // Handle the error case (optional)
+      return -1;
+    }
+    } else {
+      //Default Temperature.cpp code 
        #if TEMP_SENSOR_0_IS_CUSTOM
           return user_thermistor_to_deg_c(CTI_HOTEND_0, raw);
         #elif TEMP_SENSOR_IS_MAX_TC(0)
@@ -2186,26 +2201,6 @@ void Temperature::task() {
         #else
           break;
         #endif
-      */
-    if (TEMP_SENSOR_0 == 999) {
-    // Use the DallasTemperature library to read the temperature
-    OneWire oneWire(ONE_WIRE_BUS);
-    DallasTemperature sensors(&oneWire);
-    sensors.begin();
-    sensors.requestTemperatures();
-    float tempC = sensors.getTempCByIndex(0);
-
-    // Check if reading was successful
-    if (tempC != DEVICE_DISCONNECTED_C) {
-      // Return degrees C (up to 999, as the LCD only displays 3 digits)
-      return _MIN(tempC, 999);
-    } else {
-     // Handle the error case (optional)
-      return -1;
-    }
-    } else {
-      // Replace this with your own code if you're not using the Dallas sensor
-      return 50.0;
       }
       case 1:
         #if TEMP_SENSOR_1_IS_CUSTOM
