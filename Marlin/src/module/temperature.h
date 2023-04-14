@@ -586,7 +586,7 @@ typedef struct { raw_adc_t raw_min, raw_max; celsius_t mintemp, maxtemp; } temp_
 #include <DallasTemperature.h>
 
 #define DEVICE_DISCONNECTED_C -127.0
-#define ONE_WIRE_BUS 2
+#define ONE_WIRE_BUS 27
 
 class Temperature {
 

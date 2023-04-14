@@ -2115,7 +2115,7 @@ void Temperature::task() {
   #include <DallasTemperature.h>
 
   #define DEVICE_DISCONNECTED_C -127.0
-  #define ONE_WIRE_BUS 2
+  #define ONE_WIRE_BUS 27
   
 
   celsius_float_t Temperature::user_thermistor_to_deg_c(const uint8_t t_index, const raw_adc_t raw) {
