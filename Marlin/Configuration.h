@@ -1,7 +1,3 @@
-/* I MODIFIED A FEW THINGS AND PUT MY NAME NEXT TO EVERYTHING I MODIFIED TO KEEP TRACK.
-CONTROL F MY NAME: "Edgar" IN ORDER TO FIND EVERY PLACE THAT I MODIFIED OR THOUGHT THAT 
-WAS SOMEWHAT IMPORTANT. THANKS */
-
 /**
  * Marlin 3D Printer Firmware
  * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
@@ -103,6 +99,7 @@ WAS SOMEWHAT IMPORTANT. THANKS */
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
 #define SERIAL_PORT 0
+
 
 /**
  * Serial Port Baud Rate
@@ -231,7 +228,7 @@ WAS SOMEWHAT IMPORTANT. THANKS */
 
 // This defines the number of extruders
 // :[0, 1, 2, 3, 4, 5, 6, 7, 8]
-#define EXTRUDERS 2 //Edgar
+#define EXTRUDERS 2 // Modified 
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
 #define DEFAULT_NOMINAL_FILAMENT_DIA 2.85
@@ -550,7 +547,7 @@ WAS SOMEWHAT IMPORTANT. THANKS */
  *
  */
 
-#define HEATER_1_PIN 8  // Edgar
+#define HEATER_1_PIN 8  // Modified
 #define TEMP_SENSOR_0 999
 #define TEMP_SENSOR_1 4
 #define TEMP_SENSOR_2 4
@@ -661,7 +658,7 @@ WAS SOMEWHAT IMPORTANT. THANKS */
 //===========================================================================
 
 // @section hotend temp
-// Edgar - Here is Bang Bang and PID Information. Just FYI
+// Here is Bang Bang and PID Information. 
 // Enable PIDTEMP for PID control or MPCTEMP for Predictive Model.
 // temperature control. Disable both for bang-bang heating.
 #define PIDTEMP          // See the PID Tuning Guide at https://reprap.org/wiki/PID_Tuning
@@ -839,7 +836,7 @@ WAS SOMEWHAT IMPORTANT. THANKS */
  *
  * *** IT IS HIGHLY RECOMMENDED TO LEAVE THIS OPTION ENABLED! ***
  */
-//#define PREVENT_COLD_EXTRUSION //Edgar
+//#define PREVENT_COLD_EXTRUSION // Modified
 #define EXTRUDE_MINTEMP 170
 
 /**
@@ -880,7 +877,7 @@ WAS SOMEWHAT IMPORTANT. THANKS */
 // Enable one of the options below for CoreXY, CoreXZ, or CoreYZ kinematics,
 // either in the usual order or reversed
 //#define COREXY 
-#define NUM_AXIS 3 //Edgar
+#define NUM_AXIS 3 // Modified
 //#define COREXZ
 //#define COREYZ
 //#define COREYX
@@ -1098,13 +1095,13 @@ WAS SOMEWHAT IMPORTANT. THANKS */
 //===========================================================================
 
 // @section endstops
-#define ENDSTOPPULLUPS //Edgar - Not sure if this line is needed 
+#define ENDSTOPPULLUPS // Modified  
 // Specify here all the endstop connectors that are connected to any endstop or probe.
 // Almost all printers will be using one per axis. Probes will use one or more of the
 // extra connectors. Leave undefined any used for non-endstop and non-probe purposes.
-#define USE_XMIN_PLUG //Edgar - Removed endstop
-#define USE_YMIN_PLUG //Edgar - Removed endstop
-#define USE_ZMIN_PLUG //Edgar - Removed endstop
+#define USE_XMIN_PLUG // Removed endstop
+#define USE_YMIN_PLUG // Removed endstop
+#define USE_ZMIN_PLUG // Removed endstop
 //#define USE_IMIN_PLUG
 //#define USE_JMIN_PLUG
 //#define USE_KMIN_PLUG
