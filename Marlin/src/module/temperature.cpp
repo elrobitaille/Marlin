@@ -2114,6 +2114,8 @@ void Temperature::task() {
   #include <OneWire.h>
   #include <DallasTemperature.h>
 
+  // reference
+
   #define DEVICE_DISCONNECTED_C -127.0
   #define ONE_WIRE_BUS 27
   
