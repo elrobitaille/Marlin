@@ -3,7 +3,7 @@
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
 
-#include "/Users/edgarrobitaille/Bioreactor/Marlin/Marlin/src/module/temperature.h"
+#include "../module/temperature.h"
 #include "DallasTemperature.h"
 
 #if ARDUINO >= 100
