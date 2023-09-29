@@ -24,24 +24,31 @@
 #include "../../module/temperature.h"
 
 /**
- * M105: Read hot end and bed temperature
+ * M105: Read out water temperature and output pH 
  */
 void GcodeSuite::M105() {
 
   const int8_t target_extruder = get_target_extruder_from_command();
   if (target_extruder < 0) return;
 
+  // Update the pH value
+  update_pH();
+
   SERIAL_ECHOPGM(STR_OK);
 
   #if HAS_TEMP_SENSOR
 
+    // Report temperature and pH
     thermalManager.print_heater_states(target_extruder OPTARG(HAS_TEMP_REDUNDANT, parser.boolval('R')));
+
+    SERIAL_ECHOPAIR(" pH:", pHValue);
 
     SERIAL_EOL();
 
   #else
 
-    SERIAL_ECHOLNPGM(" T:0"); // Some hosts send M105 to test the serial connection
+    // If there's no temperature sensor, report a default temperature and the pH value
+    SERIAL_ECHOLNPAIR(" T:0 pH:", pHValue);
 
   #endif
 }
