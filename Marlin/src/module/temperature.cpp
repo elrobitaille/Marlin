@@ -2114,11 +2114,14 @@ void Temperature::task() {
   #include <OneWire.h>
   #include <DallasTemperature.h>
 
-  // reference
-
   #define DEVICE_DISCONNECTED_C -127.0
   #define ONE_WIRE_BUS 27
   
+  #define SensorPin A11
+  #define Offset 16.3 // Deviation compensate 
+  #define ArrayLenth  40
+  int pHArray[ArrayLenth];
+  int pHArrayIndex = 0;
 
   celsius_float_t Temperature::user_thermistor_to_deg_c(const uint8_t t_index, const raw_adc_t raw) {
 
